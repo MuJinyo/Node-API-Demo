@@ -2,13 +2,16 @@
 import Koa from 'koa';
 // const koaRoute = require('koa-router');
 import koaRoute from 'koa-router';
+import convert from 'koa-convert';
 const logger = require('koa-logger');
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
+import bodyParser from 'koa-bodyparser';
 const config = require('config');
+import cors from 'koa2-cors';
 
 // const userRoute = require('./route/user.js')
 import userRoute from './route/user';
-// console.log('userRoute--》', userRoute)
+import authRoute from './route/auth'
 // 这个就是config插件用来获取url的 
 mongoose.connect(config.get('mongodb.url'), function (err) {
     if (err) {
@@ -22,6 +25,8 @@ mongoose.Promise = global.Promise;
 // 连上koa
 const app = new Koa();
 
+// cookie加密key
+app.keys = ['mujin'];
 // const router = koaRoute()
 const router = new koaRoute()
 /*
@@ -31,13 +36,22 @@ const router = new koaRoute()
 
   */
 let home = new koaRoute()
-
-router.use(userRoute.routes(), userRoute.allowedMethods())
+ 
 
 app
 .use(logger())
+.use(bodyParser())
+.use(cors({
+  credentials: true,  // 是不是可以带cookie
+  allowedMethods: ['GET', 'PUT', 'POST', 'DELECT', 'HEAD', 'OPTIONS', 'PATCH']
+}))
 .use(router.routes()) // 添加路由中间件
 .use(router.allowedMethods()) // 对请求进行一些限制处理
+
+
+router.use(userRoute.routes(), userRoute.allowedMethods())
+router.use(authRoute.routes(), authRoute.allowedMethods())
+
 app.listen(3002)
 
-// export default app
+export default app

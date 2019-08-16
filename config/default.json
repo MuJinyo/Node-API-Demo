@@ -1,5 +1,10 @@
 {
     "mongodb": {
         "url": "mongodb://127.0.0.1:27017/mujin"
-    }
+    },
+    "app": {
+        "jwtSecret": "cbq926",
+        "webUrlHost": "http://dev.kiipu.com:3000",
+        "apiUrlHost": "http://dev.kiipu.com:3001"
+      }
 }
